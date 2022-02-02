@@ -20,10 +20,10 @@ const findById = (id) => {
 
 // CREATE
 const createNew = (user) => {
-    const { email, password, is_admin } = user;
+    const { firstname, lastname, email, password, is_admin } = user;
     return new Promise((resolve, reject) => {
-        dbConnect.query('INSERT INTO user (email, password, is_admin) VALUES (?, ?, ?)',
-        [email, password, is_admin], (err, result) => {
+        dbConnect.query('INSERT INTO user (firstname, lastname, email, password, is_admin) VALUES (?, ?, ?, ?, ?)',
+        [firstname, lastname, email, password, is_admin], (err, result) => {
             if (err) reject(err);
             else resolve(result.insertId);
         });
