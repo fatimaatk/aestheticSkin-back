@@ -46,8 +46,8 @@ router.post('/login', async (req, res) => {
         if (userExists) {
             const passwordIsValid = bcrypt.compareSync(userIsValid.value.password, userExists.password);
             if (passwordIsValid){
-                const token = calculateToken(userIsValid.value.email, userExists.is_admin);
-                res.status(200).send({ token: token, user: { email: userExists.email, role: userExists.is_admin } });
+                const token = calculateToken(userIsValid.value.email, userExists.is_admin, userExists.firstname, userExists.lastname, userExists.id);
+                res.status(200).send({ token: token, user: { email: userExists.email, role: userExists.is_admin, prenom: userExists.firstname, nom: userExists.lastname, id: userExists.id} });
             } 
             else res.status(401).json({ error: 'Invalid password' });
         } else res.status(404).json({ error: 'User not found' });
@@ -66,5 +66,16 @@ const verifyJWT = (req, res, next) => {
 router.get('/user', verifyJWT, (req, res) => {
     res.json({ auth: true, message: 'User is auth' }).status(200);
 })
+
+router.get('/user/account', async (req, res) => {
+    try {
+        const infos = await User.findAll();
+         res.send(infos);
+      } catch (error) {
+          res.status(500).send('Error server, try again !')
+      }
+   });
+
+   
 
 export default router;
