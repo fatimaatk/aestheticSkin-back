@@ -3,17 +3,18 @@ import dbConnect from '../config/db-config.js';
 // READ ONE
 const getOneById = (id) => {
     return new Promise((resolve, reject) => {
-        dbConnect.query('SELECT * FROM favoris WHERE user_id = ?', id, (err, result) => {
+        dbConnect.query('SELECT favoris.id, title, image1 FROM favoris INNER JOIN products ON products.id=favoris.product_id WHERE user_id = ?', id, (err, result) => {
             if (err) reject(err);
             else resolve(result);
         })
     })
 }
 
+
 // DELETE
-const deleteById = (user_id, product_id) => {
+const deleteById = (id) => {
     return new Promise((resolve, reject) => {
-        dbConnect.query('DELETE FROM favoris WHERE user_id = ? AND product_id = ?', [user_id, product_id], (err, result) => {
+        dbConnect.query('DELETE FROM favoris WHERE id = ?', id, (err, result) => {
             if (err) reject(err);
             else resolve(result.affectedRows);
         })

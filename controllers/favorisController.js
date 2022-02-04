@@ -14,18 +14,16 @@ router.get('/:id', async (req, res) => {
  });
 
 router.delete('/:id', async (req, res) => {
-  const user_id = req.params.id;
-  const product_id = req.body.product_id;
+  const favid = req.params.id;
   try {
-    const favoris = await favorisModel.deleteById(user_id, product_id)
+    const favoris = await favorisModel.deleteById(favid)
      res.send(`Le produit a bien été supprimé.`);
   } catch (error) {
       res.status(500).send('Error server, try again !')
   }
 });
 
-router.post('/', async (req, res) => {
-  
+router.post('/:id', async (req, res) => {
   const {product_id, user_id} = req.body;
   try {
       const lastInsertId = await favorisModel.createNewFavoris(product_id, user_id)
