@@ -41,6 +41,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const userIsValid = schemaUser.validate({ email, password });
+        console.log(userIsValid.value)
         if (userIsValid.error) return res.status(422).json({error: userIsValid.error.details[0].message});
         const userExists = await User.findByEmail(userIsValid.value.email);
         if (userExists) {
@@ -63,7 +64,7 @@ const verifyJWT = (req, res, next) => {
         next();
     })
 }
-router.get('/user', verifyJWT, (req, res) => {
+router.get('/admin', verifyJWT, (req, res) => {
     res.json({ auth: true, message: 'User is auth' }).status(200);
 })
 

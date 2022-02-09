@@ -5,6 +5,7 @@ import securityController from '../controllers/securityController.js';
 import adminController from '../controllers/adminController.js';
 import userController from '../controllers/userController.js';
 import infosController from '../controllers/infosController.js';
+import filterController from '../controllers/filterController.js';
 
 
 export const setupRoutes = (app) => {
@@ -15,5 +16,6 @@ export const setupRoutes = (app) => {
     app.use('/admin', adminController);
     app.use('/user', userController);
     app.use('/infos', infosController);
+    app.use('/filter', filterController);
     // ... les autres routes ...
 }
