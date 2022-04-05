@@ -1,59 +1,35 @@
-import dbConnect from '../config/db-config.js';
+import dbConnect from "../config/db-config.js";
 
-const findAll = () => {
-    return new Promise((resolve, reject) => {
-        dbConnect.query('SELECT * FROM user', (err, result) => {
-            if (err) reject(err);
-            else resolve(result);
-        })
-    })
-}
-
+//on vérifie que l'email existe
 const findByEmail = (email) => {
-    return new Promise((resolve, reject) => {
-        dbConnect.query('SELECT * FROM user WHERE email = ?', email, (err, result) => {
-            if (err) reject(err);
-            else resolve(result[0]);
-        })
+  return new Promise((resolve, reject) => {
+    dbConnect.query('SELECT * FROM user WHERE email = ?', email, (err, result) => {
+      if (err) reject(err);
+      else resolve(result[0]);
     })
+  })
 }
 
-const findById = (id) => {
-    return new Promise((resolve, reject) => {
-        dbConnect.query('SELECT * FROM user WHERE id = ?', id, (err, result) => {
-            if (err) reject(err);
-            else resolve(result[0]);
-        })
-    })
-}
-
-// CREATE
+//on crée mtn l'email
 const createNew = (user) => {
-    const { firstname, lastname, email, password, is_admin } = user;
-    return new Promise((resolve, reject) => {
-        dbConnect.query('INSERT INTO user (firstname, lastname, email, password, is_admin) VALUES (?, ?, ?, ?, ?)',
-        [firstname, lastname, email, password, is_admin], (err, result) => {
-            if (err) reject(err);
-            else resolve(result.insertId);
-        });
-    });
-};
+  const { email, password, is_admin, lastname, firstname } = user;
+  return new Promise((resolve, reject) => {
+    dbConnect.query('INSERT INTO user (email, password, is_admin, lastname, firstname) VALUES (?, ?, ?, ?, ?)',
+      [email, password, is_admin, lastname, firstname], (err, result) => {
+        if (err) reject(err);
+        else resolve(result.insertId)
+      })
+  })
+}
 
-
-const update = (id) => {
-    return new Promise((resolve, reject) => {
-        dbConnect.query("UPDATE user SET firstname = ?, lastname = ? WHERE id = ?", id , (err, result) => {
-            if (err) reject(err)
-            else resolve(result);
-        })
+//on crée un findbyid pour renvoyer au client
+const findById = (id) => {
+  return new Promise((resolve, reject) => {
+    dbConnect.query('SELECT * FROM user WHERE id = ?', id, (err, result) => {
+      if (err) reject(err);
+      else resolve(result[0]);
     })
- }
- 
- 
+  })
+}
 
-
-
-
- 
-
-export default { findByEmail, createNew, findById,findAll, update };
+export default { findByEmail, createNew, findById };

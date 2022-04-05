@@ -1,82 +1,121 @@
-import express from 'express';
-import Joi from 'joi';
-import User from '../models/userModel.js';
-import bcrypt from 'bcrypt';
-import calculateToken from '../helpers/token.js';
-import jwt from 'jsonwebtoken';
+import express from "express";
+import User from "../models/userModel.js";
+//permet de vérifier la qualité des données reçues
+import Joi from "joi";
+//permet de crypter les password
+import bcrypt from "bcrypt";
+//permet de vérifier les token, on doit ajouter la secret key dans le .env
+import jwt from "jsonwebtoken";
+
 const router = express.Router();
-
+//ici c'est le temps prévu pour le hash du password
 const saltRounds = 10;
+
+//On vérifie ensuite chaque réception
 const schemaUser = Joi.object({
-    firstname: Joi.string().max(255),
-    lastname: Joi.string().max(255),
-    email: Joi.string().email().required().trim(true),
-    password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required().trim(true),
-    is_admin: Joi.boolean().default(false)
+  email: Joi.string().email().required().trim(true),
+  password: Joi.string()
+    .regex(/^[a-zA-Z0-9]{3,30}$/)
+    .required()
+    .trim(true),
+  //ici permet d'attribuer par d"fault le isAdmin à false
+  is_admin: Joi.boolean().default(false),
+  lastname: Joi.string().required(),
+  firstname: Joi.string().required(),
 });
 
+router.post("/register", async (req, res) => {
+  const { email, password, lastname, firstname } = req.body;
+  //ici je vérifie la qualité des données
+  try {
+    //ici je valide le format de l'email et du password
+    const userIsValid = schemaUser.validate({
+      email,
+      password,
+      lastname,
+      firstname,
+    });
+    //ici si l'email n'existe pas déja en me basaant sur mon model
+    const userExist = await User.findByEmail(userIsValid.value.email);
+    //ici si l'email n'est pas bien renseigné alors envoi d'un message au client
+    if (userIsValid.error)
+      return res
+        .status(422)
+        .json({ error: userIsValid.error.details[0].messsage });
+    //ici si l'email existe deja alors envoi d'un message d'erreur au client
+    if (userExist)
+      return res.json({ error: "Email already exist" }).status(409);
 
-router.post('/register', async (req, res) => {
-    const { firstname, lastname, email, password } = req.body;
+    //ici je gère l'envoie en base de données
     try {
-        const userIsValid = schemaUser.validate({ firstname, lastname, email, password });
-        const userExists = await User.findByEmail(userIsValid.value.email);
-        if (userIsValid.error) return res.status(422).json({ error: userIsValid.error.details[0].message });
-        if (userExists) return res.json({ error: 'Vous avez déja un compte avec cette adresse email.' }).status(409);
-        try {
-            const hash = bcrypt.hashSync(userIsValid.value.password, saltRounds);
-            userIsValid.value.password = hash;
-            const userId = await User.createNew(userIsValid.value);
-            const user = await User.findById(userId);
-            res.status(201).json(user)
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
+      //ici je hash le password
+      const hash = bcrypt.hashSync(userIsValid.value.password, saltRounds);
+      userIsValid.value.password = hash;
+      //ici je recupère l'id crée
+      const userId = await User.createNew(userIsValid.value);
+      console.log(userId);
+      console.log(userId);
+
+      //ici j'envoie au client
+      const user = await User.findById(userId);
+      console.log(userId);
+      res.status(201).json(user);
     } catch (error) {
-        res.status(500).json({ message : error.message });
+      res.status(500).json({ error: error.message });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const userIsValid = schemaUser.validate({ email, password });
-        console.log(userIsValid.value)
-        if (userIsValid.error) return res.status(422).json({error: userIsValid.error.details[0].message});
-        const userExists = await User.findByEmail(userIsValid.value.email);
-        if (userExists) {
-            const passwordIsValid = bcrypt.compareSync(userIsValid.value.password, userExists.password);
-            if (passwordIsValid){
-                const token = calculateToken(userIsValid.value.email, userExists.is_admin, userExists.firstname, userExists.lastname, userExists.id);
-                res.status(200).send({ token: token, user: { email: userExists.email, role: userExists.is_admin, prenom: userExists.firstname, nom: userExists.lastname, id: userExists.id} });
-            } 
-            else res.status(401).json({ error: 'Invalid password' });
-        } else res.status(404).json({ error: 'User not found' });
-    } catch (error) {
-        res.status(500).json({ message : error.message });
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const userIsValid = schemaUser.validate({ email, password });
+    const userExist = await User.findByEmail(userIsValid.value.email);
+    if (userExist) {
+      //on récupère le mot de passe et on le compare avec celui en bdd
+      const passwordIsValid = bcrypt.compareSync(
+        userIsValid.value.password,
+        userExist.password
+      );
+      if (passwordIsValid) {
+        //je crée ici le token
+        const token = jwt.sign(
+          { id: userExist.id, role: userExist.is_admin },
+          process.env.SERVER_SECRET,
+          {
+            expiresIn: 36000 * 2,
+          }
+        );
+        //je test je vérifie le token pour voir si admin ou non
+        // jwt.verify(token, process.env.SERVER_SECRET, (err, decoded) => {
+        //   console.log(decoded)
+        // })
+
+        res.send({ token: token, user: { email: userExist.email, role: userExist.is_admin } }).status(200);
+
+      } else {
+        res.json({ error: "Invalid password" }).status(401);
+      }
+    } else {
+      res.json({ error: "User not found" }).status(404);
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
+
+//on crée notre middleware
 const verifyJWT = (req, res, next) => {
-    const token = req.headers["x-access-token"];
-    if (!token) return res.json({ error: "No token provided" }).status(401);
-    jwt.verify(token, process.env.SERVER_SECRET, (err, decoded) => {
-        if (err) return res.json({ error : "Invalid Token"}).status(401);
-        next();
-    })
+  console.log('middleware');
+  next();
 }
-router.get('/admin', verifyJWT, (req, res) => {
-    res.json({ auth: true, message: 'User is auth' }).status(200);
+
+//ici je vérifie si mon user est admin ou non
+router.get('/user-is-auth', verifyJWT, (req, res) => {
+  console.log('next middl')
 })
 
-router.get('/user/account', async (req, res) => {
-    try {
-        const infos = await User.findAll();
-         res.send(infos);
-      } catch (error) {
-          res.status(500).send('Error server, try again !')
-      }
-   });
-
-   
 
 export default router;

@@ -10,7 +10,7 @@ const port = 8000;
 // Configuration du serveur
 app.use(cors('*')); // autorise toutes les origines client
 app.use(express.json()); // parse les requêtes en json
-app.use(express.urlencoded({extended: true})); // parse les request.body en urlencoded
+app.use(express.urlencoded({ extended: true })); // parse les request.body en urlencoded
 
 // Serveur est routée grâce à cette ligne
 setupRoutes(app);
