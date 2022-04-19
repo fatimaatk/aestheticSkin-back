@@ -20,8 +20,8 @@ const schemaUser = Joi.object({
     .trim(true),
   //ici permet d'attribuer par d"fault le isAdmin à false
   is_admin: Joi.boolean().default(false),
-  lastname: Joi.string().required(),
-  firstname: Joi.string().required(),
+  lastname: Joi.string(),
+  firstname: Joi.string(),
 });
 
 router.post("/register", async (req, res) => {
@@ -36,8 +36,8 @@ router.post("/register", async (req, res) => {
       firstname,
     });
     //ici si l'email n'existe pas déja en me basaant sur mon model
-    const userExist = await User.findByEmail(userIsValid.value.email);
     //ici si l'email n'est pas bien renseigné alors envoi d'un message au client
+    const userExist = await User.findByEmail(userIsValid.value.email);
     if (userIsValid.error)
       return res
         .status(422)
@@ -72,6 +72,7 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const userIsValid = schemaUser.validate({ email, password });
+    if (userIsValid.error) return res.status(422).json({ error: userIsValid.error.details[0].message });
     const userExist = await User.findByEmail(userIsValid.value.email);
     if (userExist) {
       //on récupère le mot de passe et on le compare avec celui en bdd
@@ -82,8 +83,8 @@ router.post("/login", async (req, res) => {
       if (passwordIsValid) {
         //je crée ici le token
         const token = jwt.sign(
-          { id: userExist.id, role: userExist.is_admin },
-          process.env.SERVER_SECRET,
+          { email: userExist.email, role: userExist.is_admin },
+          process.env.SECRET_KEY,
           {
             expiresIn: 36000 * 2,
           }
@@ -92,9 +93,8 @@ router.post("/login", async (req, res) => {
         // jwt.verify(token, process.env.SERVER_SECRET, (err, decoded) => {
         //   console.log(decoded)
         // })
-
+        //je stocke dans les cookies le token
         res.send({ token: token, user: { email: userExist.email, role: userExist.is_admin } }).status(200);
-
       } else {
         res.json({ error: "Invalid password" }).status(401);
       }
@@ -108,13 +108,18 @@ router.post("/login", async (req, res) => {
 
 //on crée notre middleware
 const verifyJWT = (req, res, next) => {
-  console.log('middleware');
-  next();
+  const token = req.cookies.access_token;
+  console.log(req.headers["x-access-token"])
+  if (!token) return res.status(401).json({ error: "No token provided" });
+  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+    if (err) return res.status(401).json({ error: 'Invalid Token' })
+    next();
+  })
 }
 
 //ici je vérifie si mon user est admin ou non
 router.get('/user-is-auth', verifyJWT, (req, res) => {
-  console.log('next middl')
+  res.json({ auth: true, message: 'User is auth' })
 })
 
 
