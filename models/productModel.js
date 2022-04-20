@@ -21,7 +21,17 @@ const getOneById = (id) => {
     })
 }
 
+const updateProduct = (id) => {
+    return new Promise((resolve, reject) => {
+        dbConnect.query("UPDATE products SET title = ? WHERE id = ?", id, (err, result) => {
+            if (err) reject(err)
+            else resolve(result);
+        })
+    })
+}
 
 
 
-export default { getAll, getOneById};
+
+
+export default { getAll, getOneById, updateProduct };
