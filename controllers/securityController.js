@@ -6,7 +6,6 @@ import Joi from "joi";
 import bcrypt from "bcrypt";
 //permet de vérifier les token, on doit ajouter la secret key dans le .env
 import jwt from "jsonwebtoken";
-
 const router = express.Router();
 //ici c'est le temps prévu pour le hash du password
 const saltRounds = 10;
@@ -72,7 +71,10 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const userIsValid = schemaUser.validate({ email, password });
-    if (userIsValid.error) return res.status(422).json({ error: userIsValid.error.details[0].message });
+    if (userIsValid.error)
+      return res
+        .status(422)
+        .json({ error: userIsValid.error.details[0].message });
     const userExist = await User.findByEmail(userIsValid.value.email);
     if (userExist) {
       //on récupère le mot de passe et on le compare avec celui en bdd
@@ -83,18 +85,21 @@ router.post("/login", async (req, res) => {
       if (passwordIsValid) {
         //je crée ici le token
         const token = jwt.sign(
-          { email: userExist.email, role: userExist.is_admin },
+          {
+            email: userExist.email.toString(),
+            role: userExist.is_admin.toString(),
+          },
           process.env.SECRET_KEY,
           {
             expiresIn: 36000 * 2,
           }
         );
-        //je test je vérifie le token pour voir si admin ou non
-        // jwt.verify(token, process.env.SERVER_SECRET, (err, decoded) => {
-        //   console.log(decoded)
-        // })
-        //je stocke dans les cookies le token
-        res.send({ token: token, user: { email: userExist.email, role: userExist.is_admin } }).status(200);
+        res
+          .cookie("token", token).send({
+            email: userExist.email.toString(),
+            role: userExist.is_admin.toString(),
+          })
+          .status(200);
       } else {
         res.json({ error: "Invalid password" }).status(401);
       }
@@ -108,19 +113,17 @@ router.post("/login", async (req, res) => {
 
 //on crée notre middleware
 const verifyJWT = (req, res, next) => {
-  const token = req.cookies.access_token;
-  console.log(req.headers["x-access-token"])
-  if (!token) return res.status(401).json({ error: "No token provided" });
+  const token = req.cookies["token"];
+  if (!token) return res.json({ error: "No token provided" }).status(401);
   jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-    if (err) return res.status(401).json({ error: 'Invalid Token' })
+    if (err) return res.status(401).json({ error: "Invalid Token" });
     next();
-  })
-}
+  });
+};
 
-//ici je vérifie si mon user est admin ou non
-router.get('/user-is-auth', verifyJWT, (req, res) => {
-  res.json({ auth: true, message: 'User is auth' })
-})
-
+//ici je vérifie si mon user est connecté
+router.get("/user-is-auth", verifyJWT, (req, res) => {
+  res.json({ auth: true, message: "User is auth" });
+});
 
 export default router;

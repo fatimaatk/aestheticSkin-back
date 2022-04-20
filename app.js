@@ -1,14 +1,15 @@
 // Import des dépendences du serveur avec express / cors 
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 // Import du fichier de gestion des routes || ROUTER DU SERVEUR
 import { setupRoutes } from './routes/router.js';
 
 const app = express();
 const port = 8000;
-app.use(bodyParser.json());
+
+app.use(cookieParser())
 
 // Configuration du serveur
 app.use(cors('*')); // autorise toutes les origines client
