@@ -1,37 +1,43 @@
-import dbConnect from '../config/db-config.js';
-
+import dbConnect from "../config/db-config.js";
 
 // READ ALL
 const getAll = () => {
     return new Promise((resolve, reject) => {
-        dbConnect.query('SELECT * FROM products', (err, results) => {
-            if (err) reject(err);
-            else resolve(results);
-        })
-    })
-}
+        dbConnect.query(
+            "SELECT products.id, products.title, products.image1, products.image2, products.image3, products.image4, products.price, products.description, products.ingredients, products.contenance, products.texture_id, texture.texture_title, products.category_id, category.category_title FROM products INNER JOIN texture ON products.texture_id = texture.id INNER JOIN category ON products.category_id = category.id",
+            (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            }
+        );
+    });
+};
 
 // READ ONE
 const getOneById = (id) => {
     return new Promise((resolve, reject) => {
-        dbConnect.query('SELECT * FROM products WHERE id = ?', id, (err, result) => {
-            if (err) reject(err);
-            else resolve(result[0]);
-        })
-    })
-}
+        dbConnect.query(
+            "SELECT products.id, products.title, products.image1, products.image2, products.image3, products.image4, products.price, products.description, products.ingredients, products.contenance, products.texture_id, texture.texture_title, products.category_id, category.category_title FROM products INNER JOIN texture ON products.texture_id = texture.id INNER JOIN category ON products.category_id = category.id WHERE products.id = ?",
+            id,
+            (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]);
+            }
+        );
+    });
+};
 
 const updateProduct = (id) => {
     return new Promise((resolve, reject) => {
-        dbConnect.query("UPDATE products SET title = ? WHERE id = ?", id, (err, result) => {
-            if (err) reject(err)
-            else resolve(result);
-        })
-    })
-}
-
-
-
-
+        dbConnect.query(
+            "UPDATE products SET title = ? WHERE id = ?",
+            id,
+            (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            }
+        );
+    });
+};
 
 export default { getAll, getOneById, updateProduct };
