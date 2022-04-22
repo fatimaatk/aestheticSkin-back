@@ -4,6 +4,7 @@ import commentsController from '../controllers/commentsController.js';
 import securityController from '../controllers/securityController.js';
 import adminController from '../controllers/adminController.js';
 import infosController from '../controllers/infosController.js';
+import userController from '../controllers/userController.js';
 import filterController from '../controllers/filterController.js';
 import textureController from '../controllers/textureController.js';
 import descriptionController from '../controllers/descriptionController.js';
@@ -13,6 +14,7 @@ import ingredientsController from '../controllers/ingredientController.js';
 import imageController from '../controllers/imageController.js';
 
 
+
 export const setupRoutes = (app) => {
     app.use('/products', productsController);
     app.use('/favoris', favorisController);
@@ -20,11 +22,12 @@ export const setupRoutes = (app) => {
     app.use('/security', securityController);
     app.use('/admin', adminController);
     app.use('/infos', infosController);
+    app.use('/user', userController);
     app.use('/filter', filterController);
     app.use('/textures', textureController);
     app.use('/description', descriptionController);
     app.use('/contenance', contenanceController);
     app.use('/price', priceController);
     app.use('/ingredients', ingredientsController);
-    app.use('/change_image', imageController);
+    app.use('/images', imageController)
 }

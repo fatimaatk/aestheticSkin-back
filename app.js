@@ -3,8 +3,10 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
+
 // Import du fichier de gestion des routes || ROUTER DU SERVEUR
 import { setupRoutes } from './routes/router.js';
+
 
 const app = express();
 const port = 8000;
