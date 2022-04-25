@@ -1,27 +1,36 @@
 import express from 'express';
 import commentsModel from '../models/commentsModel.js';
-const router = express.Router(); 
+const router = express.Router();
 
+router.get('/', async (req, res) => {
+  try {
+    const comments = await commentsModel.getAllComments();
+    console.log(comments)
+    res.send(comments);
+  } catch (error) {
+    res.status(500).send('Error server, try again !')
+  }
+});
 
 router.get('/:id', async (req, res) => {
   const id = Number(req.params.id)
-    try {
-      const comments = await commentsModel.getAllCommentsProduct(id)
-       res.send(comments);
-    } catch (error) {
-        res.status(500).send('Error server, try again !')
-    }
- });
+  try {
+    const comments = await commentsModel.getAllCommentsProduct(id)
+    res.send(comments);
+  } catch (error) {
+    res.status(500).send('Error server, try again !')
+  }
+});
 
- router.get('/rates/:id', async (req, res) => {
+router.get('/rates/:id', async (req, res) => {
   const id = Number(req.params.id)
-    try {
-      const rates = await commentsModel.getAllRatesProduct(id)
-       res.send(rates);
-    } catch (error) {
-        res.status(500).send('Error server, try again !')
-    }
- });
+  try {
+    const rates = await commentsModel.getAllRatesProduct(id)
+    res.send(rates);
+  } catch (error) {
+    res.status(500).send('Error server, try again !')
+  }
+});
 
 
 // router.delete('/:id', async (req, res) => {

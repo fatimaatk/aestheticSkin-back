@@ -7,6 +7,7 @@ import infosController from '../controllers/infosController.js';
 import userController from '../controllers/userController.js';
 import filterController from '../controllers/filterController.js';
 import textureController from '../controllers/textureController.js';
+import categoryController from '../controllers/categoryController.js';
 import descriptionController from '../controllers/descriptionController.js';
 import contenanceController from '../controllers/contenanceController.js';
 import priceController from '../controllers/priceController.js';
@@ -25,6 +26,7 @@ export const setupRoutes = (app) => {
     app.use('/user', userController);
     app.use('/filter', filterController);
     app.use('/textures', textureController);
+    app.use('/categories', categoryController)
     app.use('/description', descriptionController);
     app.use('/contenance', contenanceController);
     app.use('/price', priceController);

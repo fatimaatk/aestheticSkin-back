@@ -54,15 +54,6 @@ router.put('/delete/image3/:id', async (req, res) => {
   }
 });
 
-router.put('/delete/image4/:id', async (req, res) => {
-  const id = req.params.id;
-  try {
-    const updateInfos = await imageModel.deleteImage4(id);
-    res.send(updateInfos)
-  } catch (error) {
-    res.status(500).send('Error server, try again !')
-  }
-});
 
 //new image
 
@@ -90,7 +81,7 @@ router.put('/update/image2/:id', upload.single('image2'), async (req, res) => {
     id
   ]
   try {
-    const updateInfos = await imageModel.updateImage4(infos, id);
+    const updateInfos = await imageModel.updateImage2(infos, id);
     console.log("infos", updateInfos)
     res.send(updateInfos)
   } catch (error) {
@@ -108,21 +99,6 @@ router.put('/update/image3/:id', upload.single('image3'), async (req, res) => {
   try {
     const updateInfos = await imageModel.updateImage3(infos, id);
     console.log("infos", updateInfos)
-    res.send(updateInfos)
-  } catch (error) {
-    res.status(500).send('Error server, try again !')
-  }
-});
-
-router.put('/update/image4/:id', upload.single('image4'), async (req, res) => {
-  const id = req.params.id;
-  const image = `http://localhost:3000/assets/${req.file.filename}`;
-  const infos = [
-    image,
-    id
-  ]
-  try {
-    const updateInfos = await imageModel.updateImage4(infos, id);
     res.send(updateInfos)
   } catch (error) {
     res.status(500).send('Error server, try again !')

@@ -24,14 +24,6 @@ const deleteImage3 = (id) => {
     })
   })
 }
-const deleteImage4 = (id) => {
-  return new Promise((resolve, reject) => {
-    dbConnect.query("UPDATE products SET image4 = null WHERE id = ?", id, (err, result) => {
-      if (err) reject(err)
-      else resolve(result);
-    })
-  })
-}
 
 const updateImage1 = (id) => {
   return new Promise((resolve, reject) => {
@@ -57,14 +49,7 @@ const updateImage3 = (id) => {
     })
   })
 }
-const updateImage4 = (id) => {
-  return new Promise((resolve, reject) => {
-    dbConnect.query("UPDATE products SET image4 = ? WHERE id = ?", id, (err, result) => {
-      if (err) reject(err)
-      else resolve(result);
-    })
-  })
-}
 
 
-export default { deleteImage1, deleteImage2, deleteImage3, deleteImage4, updateImage1, updateImage2, updateImage3, updateImage4 };
+
+export default { deleteImage1, deleteImage2, deleteImage3, updateImage1, updateImage2, updateImage3 };
