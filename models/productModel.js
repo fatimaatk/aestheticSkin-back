@@ -43,7 +43,7 @@ const updateProduct = (id) => {
 const createProduct = (product) => {
     const { title, image1, image2, image3, price, category_id, texture_id, description, ingredients, contenance } = product;
     return new Promise((resolve, reject) => {
-        dbConnect.query('INSERT INTO products (title, image1, image2, image3, price, category_id, texture_id, description, ingredients, contenance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        dbConnect.query('INSERT INTO products (title, image1, image2, image3, price, category_id, texture_id, description, ingredients, contenance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [title, image1, image2, image3, price, category_id, texture_id, description, ingredients, contenance], (err, result) => {
                 if (err) reject(err);
                 else resolve(result.insertId);

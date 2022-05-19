@@ -5,14 +5,13 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const comments = await commentsModel.getAllComments();
-    console.log(comments)
     res.send(comments);
   } catch (error) {
     res.status(500).send('Error server, try again !')
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/product/:id', async (req, res) => {
   const id = Number(req.params.id)
   try {
     const comments = await commentsModel.getAllCommentsProduct(id)
@@ -31,6 +30,15 @@ router.get('/rates/:id', async (req, res) => {
     res.status(500).send('Error server, try again !')
   }
 });
+
+router.put('/update/:id', async (req, res) => {
+  try {
+    const visibility = await commentsModel.editCommentVisibility(id)
+    res.send(visibility);
+  } catch (error) {
+    res.status(500).send('Error server, try again !')
+  }
+})
 
 
 // router.delete('/:id', async (req, res) => {
