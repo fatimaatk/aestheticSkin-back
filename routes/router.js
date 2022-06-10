@@ -13,6 +13,7 @@ import contenanceController from '../controllers/contenanceController.js';
 import priceController from '../controllers/priceController.js';
 import ingredientsController from '../controllers/ingredientController.js';
 import imageController from '../controllers/imageController.js';
+import accountController from '../controllers/accountController.js';
 
 
 
@@ -32,4 +33,5 @@ export const setupRoutes = (app) => {
     app.use('/price', priceController);
     app.use('/ingredients', ingredientsController);
     app.use('/images', imageController)
+    app.use('/accounts', accountController)
 }

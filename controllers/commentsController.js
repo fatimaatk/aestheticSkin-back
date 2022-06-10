@@ -1,5 +1,6 @@
 import express from 'express';
 import commentsModel from '../models/commentsModel.js';
+
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -32,8 +33,10 @@ router.get('/rates/:id', async (req, res) => {
 });
 
 router.put('/update/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const infos = [req.body.isVisible, id];
   try {
-    const visibility = await commentsModel.editCommentVisibility(id)
+    const visibility = await commentsModel.editCommentVisibility(infos, id)
     res.send(visibility);
   } catch (error) {
     res.status(500).send('Error server, try again !')

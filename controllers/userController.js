@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import userModel from '../models/userMode2l.js';
+import userModel from '../models/userModel.js';
 
 const router = express.Router();
 
@@ -30,6 +30,15 @@ router.get('/infos/:id', async (req, res) => {
     const id = req.params.id;
     try {
         const user = await userModel.findById(id)
+        res.send(user);
+    } catch (error) {
+        res.status(500).send('Error server, try again !')
+    }
+});
+router.get('/infos/:id', async (req, res) => {
+    const email = req.body.email;
+    try {
+        const user = await userModel.findByEmail(email)
         res.send(user);
     } catch (error) {
         res.status(500).send('Error server, try again !')

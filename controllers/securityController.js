@@ -88,6 +88,8 @@ router.post("/login", async (req, res) => {
           {
             email: userExist.email.toString(),
             role: userExist.is_admin.toString(),
+            firstname: userExist.firstname.toString(),
+            lastname: userExist.lastname.toString(),
           },
           process.env.SECRET_KEY,
           {
@@ -98,6 +100,8 @@ router.post("/login", async (req, res) => {
           .cookie("token", token).send({
             email: userExist.email.toString(),
             role: userExist.is_admin.toString(),
+            firstname: userExist.firstname.toString(),
+            lastname: userExist.lastname.toString(),
           })
           .status(200);
       } else {

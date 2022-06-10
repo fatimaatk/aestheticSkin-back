@@ -1,5 +1,7 @@
 import dbConnect from "../config/db-config.js";
 
+
+
 //on vérifie que l'email existe
 const findByEmail = (email) => {
   return new Promise((resolve, reject) => {
@@ -32,4 +34,4 @@ const findById = (id) => {
   })
 }
 
-export default { findByEmail, createNew, findById };
+export default { findByEmail, createNew, findById, findByEmail };
