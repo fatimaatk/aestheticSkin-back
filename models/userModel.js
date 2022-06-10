@@ -34,4 +34,45 @@ const findById = (id) => {
   })
 }
 
-export default { findByEmail, createNew, findById, findByEmail };
+const updateLastname = (id) => {
+  return new Promise((resolve, reject) => {
+    dbConnect.query("UPDATE user SET lastname = ? WHERE id = ?", id, (err, result) => {
+      if (err) reject(err)
+      else resolve(result);
+    })
+  })
+}
+const updateFirstname = (id) => {
+  return new Promise((resolve, reject) => {
+    dbConnect.query("UPDATE user SET firstname = ? WHERE id = ?", id, (err, result) => {
+      if (err) reject(err)
+      else resolve(result);
+    })
+  })
+}
+const updateAdresse = (id) => {
+  return new Promise((resolve, reject) => {
+    dbConnect.query("UPDATE user SET adresse = ? WHERE id = ?", id, (err, result) => {
+      if (err) reject(err)
+      else resolve(result);
+    })
+  })
+}
+const updateCodePostal = (id) => {
+  return new Promise((resolve, reject) => {
+    dbConnect.query("UPDATE user SET codePostal = ? WHERE id = ?", id, (err, result) => {
+      if (err) reject(err)
+      else resolve(result);
+    })
+  })
+}
+const updateVille = (id) => {
+  return new Promise((resolve, reject) => {
+    dbConnect.query("UPDATE user SET ville = ? WHERE id = ?", id, (err, result) => {
+      if (err) reject(err)
+      else resolve(result);
+    })
+  })
+}
+
+export default { findByEmail, createNew, findById, findByEmail, updateAdresse, updateCodePostal, updateVille, updateFirstname, updateLastname };

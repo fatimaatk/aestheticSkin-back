@@ -52,12 +52,9 @@ router.post("/register", async (req, res) => {
       userIsValid.value.password = hash;
       //ici je recupère l'id crée
       const userId = await User.createNew(userIsValid.value);
-      console.log(userId);
-      console.log(userId);
-
       //ici j'envoie au client
       const user = await User.findById(userId);
-      console.log(userId);
+
       res.status(201).json(user);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -90,6 +87,10 @@ router.post("/login", async (req, res) => {
             role: userExist.is_admin.toString(),
             firstname: userExist.firstname.toString(),
             lastname: userExist.lastname.toString(),
+            adresse: userExist.adresse.toString(),
+            codePostal: userExist.codePostal,
+            ville: userExist.ville.toString(),
+            id: userExist.id,
           },
           process.env.SECRET_KEY,
           {
@@ -102,6 +103,10 @@ router.post("/login", async (req, res) => {
             role: userExist.is_admin.toString(),
             firstname: userExist.firstname.toString(),
             lastname: userExist.lastname.toString(),
+            adresse: userExist.adresse.toString(),
+            codePostal: userExist.codePostal,
+            ville: userExist.ville.toString(),
+            id: userExist.id,
           })
           .status(200);
       } else {
