@@ -14,10 +14,10 @@ const findByEmail = (email) => {
 
 //on crée mtn l'email
 const createNew = (user) => {
-  const { email, password, is_admin, lastname, firstname } = user;
+  const { email, password, is_admin, lastname, firstname, adresse, codePostal, ville } = user;
   return new Promise((resolve, reject) => {
-    dbConnect.query('INSERT INTO user (email, password, is_admin, lastname, firstname) VALUES (?, ?, ?, ?, ?)',
-      [email, password, is_admin, lastname, firstname], (err, result) => {
+    dbConnect.query('INSERT INTO user (email, password, is_admin, lastname, firstname, adresse, codePostal, ville) VALUES (?, ?, ?, ?, ?, ?, ?,?)',
+      [email, password, is_admin, lastname, firstname, adresse, codePostal, ville], (err, result) => {
         if (err) reject(err);
         else resolve(result.insertId)
       })

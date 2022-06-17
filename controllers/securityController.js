@@ -21,10 +21,13 @@ const schemaUser = Joi.object({
   is_admin: Joi.boolean().default(false),
   lastname: Joi.string(),
   firstname: Joi.string(),
+  adresse: Joi.string(),
+  codePostal: Joi.number(),
+  ville: Joi.string(),
 });
 
 router.post("/register", async (req, res) => {
-  const { email, password, lastname, firstname } = req.body;
+  const { email, password, lastname, firstname, adresse, codePostal, ville } = req.body;
   //ici je vérifie la qualité des données
   try {
     //ici je valide le format de l'email et du password
@@ -33,7 +36,11 @@ router.post("/register", async (req, res) => {
       password,
       lastname,
       firstname,
+      adresse,
+      codePostal,
+      ville
     });
+    console.log(userIsValid)
     //ici si l'email n'existe pas déja en me basaant sur mon model
     //ici si l'email n'est pas bien renseigné alors envoi d'un message au client
     const userExist = await User.findByEmail(userIsValid.value.email);
@@ -43,7 +50,7 @@ router.post("/register", async (req, res) => {
         .json({ error: userIsValid.error.details[0].messsage });
     //ici si l'email existe deja alors envoi d'un message d'erreur au client
     if (userExist)
-      return res.json({ error: "Email already exist" }).status(409);
+      return res.json({ error: "Cet email existe déjà." }).status(409);
 
     //ici je gère l'envoie en base de données
     try {
@@ -51,11 +58,14 @@ router.post("/register", async (req, res) => {
       const hash = bcrypt.hashSync(userIsValid.value.password, saltRounds);
       userIsValid.value.password = hash;
       //ici je recupère l'id crée
+
       const userId = await User.createNew(userIsValid.value);
+      console.log(userId)
       //ici j'envoie au client
       const user = await User.findById(userId);
 
       res.status(201).json(user);
+
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -97,6 +107,7 @@ router.post("/login", async (req, res) => {
             expiresIn: 36000 * 2,
           }
         );
+        console.log(token)
         res
           .cookie("token", token).send({
             email: userExist.email.toString(),
@@ -110,10 +121,10 @@ router.post("/login", async (req, res) => {
           })
           .status(200);
       } else {
-        res.json({ error: "Invalid password" }).status(401);
+        res.json({ error: "Mot de passe incorrect" }).status(401);
       }
     } else {
-      res.json({ error: "User not found" }).status(404);
+      res.json({ error: "Email incorrect" }).status(404);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
