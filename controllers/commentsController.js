@@ -44,31 +44,22 @@ router.put('/update/:id', async (req, res) => {
 })
 
 
-// router.delete('/:id', async (req, res) => {
-//   const user_id = Number(req.params.id)
-//   const product_id = Number(req.body.product_id)
-//   try {
-//     const favoris = await favorisModel.deleteById(user_id, product_id)
-//      res.send(`Le produit a bien été supprimé.`);
-//   } catch (error) {
-//       res.status(500).send('Error server, try again !')
-//   }
-// });
+router.post('/', async (req, res) => {
+  const { rate_id, user_id, product_id, comment } = req.body
+  try {
+    const lastInsertId = await commentsModel.postComment(rate_id, user_id, product_id, comment);
+    console.log(lastInsertId)
+    if (lastInsertId) {
+      const newComment = await commentsModel.getOneById(lastInsertId);
+      res.json(newComment);
+    } else
+      res.status(422).json({ message: error.message })
 
-// router.post('/', async (req, res) => {
-//   const {product_id, user_id} = req.body;
-//   try {
-//       const lastInsertId = await favorisModel.createNewFavoris(product_id, user_id)
-//       if(lastInsertId) {
-//         const newFavoris = await favorisModel.getOneById(lastInsertId)
-//         res.json('Le produit a bien été ajouté à vos favoris.')
-//       }
-//       else res.status(422).json({ message: error.message });
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-//   });
-
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: err.message });
+  }
+});
 
 
 export default router;

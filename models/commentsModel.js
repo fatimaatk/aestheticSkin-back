@@ -37,5 +37,24 @@ const editCommentVisibility = (id) => {
     })
 }
 
+// READ ONE
+const getOneById = (id) => {
+    return new Promise((resolve, reject) => {
+        dbConnect.query('SELECT * FROM rate_comment WHERE id = ?', id, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        })
+    })
+}
 
-export default { getAllComments, getAllCommentsProduct, getAllRatesProduct, editCommentVisibility };
+const postComment = (rate_id, user_id, product_id, comment) => {
+    return new Promise((resolve, reject) => {
+        dbConnect.query('INSERT INTO rate_comment (rate_id, user_id, product_id, comment) VALUES (?, ?, ?, ?)',
+            [rate_id, user_id, product_id, comment], (err, result) => {
+                if (err) reject(err);
+                else resolve(result.insertId);
+            })
+    })
+}
+
+export default { getAllComments, getAllCommentsProduct, getAllRatesProduct, editCommentVisibility, postComment, getOneById };
