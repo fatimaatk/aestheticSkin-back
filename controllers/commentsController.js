@@ -48,7 +48,6 @@ router.post('/', async (req, res) => {
   const { rate_id, user_id, product_id, comment } = req.body
   try {
     const lastInsertId = await commentsModel.postComment(rate_id, user_id, product_id, comment);
-    console.log(lastInsertId)
     if (lastInsertId) {
       const newComment = await commentsModel.getOneById(lastInsertId);
       res.json(newComment);
