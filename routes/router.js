@@ -14,6 +14,7 @@ import priceController from '../controllers/priceController.js';
 import ingredientsController from '../controllers/ingredientController.js';
 import imageController from '../controllers/imageController.js';
 import accountController from '../controllers/accountController.js';
+import cartController from '../controllers/cartController.js';
 
 
 
@@ -34,4 +35,5 @@ export const setupRoutes = (app) => {
     app.use('/ingredients', ingredientsController);
     app.use('/images', imageController)
     app.use('/accounts', accountController)
+    app.use('/cart', cartController)
 }
