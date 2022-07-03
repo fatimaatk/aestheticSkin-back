@@ -16,6 +16,14 @@ const getAllId = () => {
     })
   })
 }
+const getAllFromCartById = (id) => {
+  return new Promise((resolve, reject) => {
+    dbConnect.query('SELECT * from cart where id = ?', id, (err, result) => {
+      if (err) reject(err);
+      else resolve(result);
+    })
+  })
+}
 const getAllFromIdCart = (id) => {
   return new Promise((resolve, reject) => {
     dbConnect.query('SELECT * from many_product_cart LEFT JOIN cart ON many_product_cart.cart_id = cart.id LEFT JOIN products ON many_product_cart.product_id = products.id WHERE cart.id = ?', id, (err, result) => {
@@ -45,12 +53,13 @@ const UpdateItemInCart = (id) => {
   })
 }
 
+
 //CREATION DE L'id cart
 const NewCart = (cart) => {
-  const { user_id, adress_shipping, adress_delivery, type_paiement, status_id, price_delivery, total_price, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery } = cart;
+  const { user_id, nom_delivery, prenom_delivery, nom_shipping, prenom_shipping, adress_shipping, adress_delivery, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery } = cart;
   return new Promise((resolve, reject) => {
-    dbConnect.query('INSERT INTO cart (user_id, adress_shipping, adress_delivery, type_paiement, status_id, price_delivery, total_price, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [user_id, adress_shipping, adress_delivery, type_paiement, status_id, price_delivery, total_price, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery], (err, result) => {
+    dbConnect.query('INSERT INTO cart (user_id, nom_delivery, prenom_delivery, nom_shipping, prenom_shipping, adress_shipping, adress_delivery, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery ) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?, ?, ?)',
+      [user_id, nom_delivery, prenom_delivery, nom_shipping, prenom_shipping, adress_shipping, adress_delivery, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery], (err, result) => {
         if (err) reject(err);
         else resolve(result.insertId);
       })
@@ -61,7 +70,7 @@ const NewCart = (cart) => {
 //PUT INFO USER
 const UpdateCart = (id) => {
   return new Promise((resolve, reject) => {
-    dbConnect.query('UPDATE cart SET user_id = ?, adress_shipping =?, adress_delivery = ?, codePostal_shipping = ?, ville_shipping = ?, codePostal_delivery = ?, ville_delivery = ? WHERE id = ?', id, (err, result) => {
+    dbConnect.query('UPDATE cart SET user_id = ?, nom_delivery = ? , prenom_delivery = ?, nom_shipping = ?, prenom_shipping = ?, adress_shipping = ?, adress_delivery = ?, codePostal_shipping = ?, ville_shipping = ?, codePostal_delivery = ?, ville_delivery = ? WHERE id = ?', id, (err, result) => {
       if (err) reject(err);
       else resolve(result.insertId);
     })
@@ -84,6 +93,4 @@ const UpdateStatus = (id) => {
     })
   })
 }
-export default { getAllFromCart, NewItemInCart, getAllFromIdCart, NewCart, UpdateItemInCart, UpdateCart, UpdateCartPayment, UpdateStatus, getAllId };
-
-// 'SELECT cart.id, JSON_ARRAY(products.title, products.price) AS item_cart FROM many_product_cart LEFT JOIN cart ON many_product_cart.cart_id = cart.id LEFT JOIN item_cart ON many_product_cart.item_cart_id = item_cart.id INNER JOIN products ON item_cart.product_id = products.id '
+export default { getAllFromCart, NewItemInCart, getAllFromIdCart, NewCart, UpdateItemInCart, UpdateCart, UpdateCartPayment, UpdateStatus, getAllId, getAllFromCartById };

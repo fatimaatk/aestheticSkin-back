@@ -34,18 +34,18 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-
-//creation d'un nouveau panier -> nouvel id
-router.post('/new', async (req, res) => {
-  const { user_id, adress_shipping, adress_delivery, type_paiement, status_id, price_delivery, total_price, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery } = req.body;
+//toute la commande par id
+router.get('/infos/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const newItem = await CartModel.NewCart({ user_id, adress_shipping, adress_delivery, type_paiement, status_id, price_delivery, total_price, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery })
-    res.json(newItem)
+    const carts = await CartModel.getAllFromCartById(id)
+    res.send(carts)
   } catch (error) {
     res.status(500).send('Error server, try again !')
   }
+});
 
-})
+
 
 //liaison nouvel id avec les articles correspondants
 router.post('/items', async (req, res) => {
@@ -53,6 +53,19 @@ router.post('/items', async (req, res) => {
   console.log(req.body)
   try {
     const newItem = await CartModel.NewItemInCart({ cart_id, product_id, qty })
+    res.status(200).json(newItem)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Error server, try again !')
+  }
+})
+//liaison nouvel id avec les articles correspondants
+router.post('/new', async (req, res) => {
+  const { user_id, nom_delivery, prenom_delivery, nom_shipping, prenom_shipping, adress_shipping, adress_delivery, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery } = req.body;
+  console.log(req.body)
+  try {
+    const newItem = await CartModel.NewCart({ user_id, nom_delivery, prenom_delivery, nom_shipping, prenom_shipping, adress_shipping, adress_delivery, codePostal_shipping, ville_shipping, codePostal_delivery, ville_delivery })
+    console.log(newItem)
     res.status(200).json(newItem)
   } catch (error) {
     console.log(error)
@@ -76,12 +89,18 @@ router.put('/items/:id', async (req, res) => {
     res.status(500).send('Error server, try again !')
   }
 });
+
+
 //maj info livraisons
 //PUT INFO USER
 router.put('/delivery/:id', async (req, res) => {
   const id = req.params.id;
   const infos = [
     req.body.user_id,
+    req.body.nom_delivery,
+    req.body.prenom_delivery,
+    req.body.nom_shipping,
+    req.body.prenom_shipping,
     req.body.adress_shipping,
     req.body.adress_delivery,
     req.body.codePostal_shipping,
@@ -90,10 +109,12 @@ router.put('/delivery/:id', async (req, res) => {
     req.body.ville_delivery,
     id
   ];
+  console.log(infos)
   try {
     const updateInfos = await CartModel.UpdateCart(infos, id);
     res.status(200).send('Information d adresse mis à jour !')
   } catch (error) {
+    console.log(error)
     res.status(500).send('Error server, try again !')
   }
 });
