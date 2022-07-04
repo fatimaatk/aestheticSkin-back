@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : dim. 03 juil. 2022 à 20:20
+-- Généré le : lun. 04 juil. 2022 à 14:37
 -- Version du serveur : 5.7.36
 -- Version de PHP : 7.4.26
 
@@ -45,25 +45,21 @@ CREATE TABLE IF NOT EXISTS `cart` (
   `ville_shipping` varchar(255) DEFAULT NULL,
   `codePostal_delivery` int(11) DEFAULT NULL,
   `ville_delivery` varchar(255) DEFAULT NULL,
+  `date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `status_id` (`status_id`),
   KEY `paiement_id` (`type_paiement`),
   KEY `user_id` (`user_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `cart`
 --
 
-INSERT INTO `cart` (`id`, `user_id`, `nom_delivery`, `prenom_delivery`, `nom_shipping`, `prenom_shipping`, `adress_shipping`, `adress_delivery`, `type_paiement`, `status_id`, `price_delivery`, `total_price`, `codePostal_shipping`, `ville_shipping`, `codePostal_delivery`, `ville_delivery`) VALUES
-(1, 23, '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(11, 22, 'coucou', 'coucou', 'coucou', 'coucou', 'coucou', 'coucou', NULL, NULL, NULL, NULL, 59000, 'coucou', 59000, 'coucou'),
-(12, NULL, 'test', 'test', 'test', 'test', 'test', 'test', NULL, NULL, NULL, NULL, 5900, 'post', 5900, 'post'),
-(13, NULL, 'test', 'test', 'test', 'test', 'ccoucou', 'ccoucou', NULL, NULL, NULL, NULL, 5900000, 'post', 5900000, 'post'),
-(14, 22, 'test', 'test', 'test', 'test', 'test', 'test', NULL, NULL, NULL, NULL, 59000, 'test', 59000, 'test'),
-(15, 22, 'test', 'test', 'test', 'test', 'test', 'test', NULL, NULL, NULL, NULL, 59000, 'test', 59000, 'test'),
-(16, 22, 'Ait Khelifa', 'Fatima', 'Ait Khelifa', 'Fatima', '23 rue de l\'amiral courbet', '23 rue de l\'amiral courbet', 1, 1, 0, 51, 59000, 'Lille', 59000, 'Lille'),
-(17, 22, 'Ait Khelifa', 'Fatima', 'Ait Khelifa', 'Fatima', '23 rue de l\'amiral courbet', '23 rue de l\'amiral courbet', NULL, 1, 0, 198, 59000, 'Lille', 59000, 'Lille');
+INSERT INTO `cart` (`id`, `user_id`, `nom_delivery`, `prenom_delivery`, `nom_shipping`, `prenom_shipping`, `adress_shipping`, `adress_delivery`, `type_paiement`, `status_id`, `price_delivery`, `total_price`, `codePostal_shipping`, `ville_shipping`, `codePostal_delivery`, `ville_delivery`, `date`) VALUES
+(27, 22, 'Ait Khelifa', 'Fatima', 'Ait Khelifa', 'Fatima', '23 rue de l\'amiral courbet', '23 rue de l\'amiral courbet', 1, 3, 0, 51, 59000, 'Lille', 59000, 'Lille', '2022-07-04'),
+(28, 35, 'Ait Khelifa', 'Fatima', 'Ait Khelifa', 'Fatima', '23 rue de l\'amiral courbet', '23 rue de l\'amiral courbet', 3, 2, 0, 110, 59000, 'Lille', 59000, 'Lille', '2022-07-04'),
+(29, 34, 'Bertrand', 'Bertrand', 'Bertrand', 'Bertrand', '23 rue de l\'amiral courbet', '23 rue de l\'amiral courbet', 3, 2, 0, 108, 59000, 'Lille', 59000, 'Lille', '2022-07-04');
 
 -- --------------------------------------------------------
 
@@ -108,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `delivery_status` (
 
 INSERT INTO `delivery_status` (`id`, `status`) VALUES
 (1, 'Validée'),
-(2, 'En cours'),
+(2, 'En cours de préparation'),
 (3, 'Livrée');
 
 -- --------------------------------------------------------
@@ -157,21 +153,22 @@ CREATE TABLE IF NOT EXISTS `many_product_cart` (
   PRIMARY KEY (`id`),
   KEY `cart_fk` (`cart_id`),
   KEY `product_fk` (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `many_product_cart`
 --
 
 INSERT INTO `many_product_cart` (`id`, `cart_id`, `product_id`, `qty`) VALUES
-(1, 1, 1, 2),
-(2, 16, 1, 1),
-(3, 16, 3, 1),
-(4, 16, 1, 1),
-(5, 16, 3, 1),
-(6, 17, 1, 4),
-(7, 17, 3, 1),
-(8, 17, 5, 4);
+(32, 27, 1, 1),
+(33, 27, 3, 1),
+(34, 28, 1, 1),
+(35, 28, 5, 2),
+(36, 28, 6, 2),
+(37, 29, 3, 2),
+(38, 29, 5, 1),
+(39, 29, 6, 1),
+(40, 29, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -360,7 +357,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `ville` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `user`
@@ -376,7 +373,10 @@ INSERT INTO `user` (`id`, `email`, `password`, `is_admin`, `lastname`, `firstnam
 (30, '1@1.com', '$2b$10$dLvlyPcX1EPVix0j/rikBekVp6NrPaLMgjWAfebzS6ebfLUs1jbYi', 0, 'coucou', 'couccou', 'coucou', 59000, 'COUCOU'),
 (31, 'testtt@test.com', '$2b$10$qEWTApomx2r13lpIWyYnSe8ZxDVHZo4txeTgzOfRcETc2cd1h7uAS', 0, 'fatima', 'fatima', 'coucou', 59, 'coucou'),
 (32, 'coucou@coucouuu.com', '$2b$10$7YVQ4XqjXsl9823pAAZfd.ZRp/HEddpkzRO4.hrTRZkUHkjFaHSa2', 0, 'coucou', 'bertrand', '212121', 21212, 'lille'),
-(33, 'nouveau@nouveau.com', '$2b$10$WEQerS9iqR9qrGrYgsQkR.dMaHGeRHbLqBaW4WKeiRbT3ZNe/qp6e', 0, 'nouveau', 'nouveau', '111', 11111, 'nouveau');
+(33, 'nouveau@nouveau.com', '$2b$10$WEQerS9iqR9qrGrYgsQkR.dMaHGeRHbLqBaW4WKeiRbT3ZNe/qp6e', 0, 'nouveau', 'nouveau', '111', 11111, 'nouveau'),
+(34, 'bertrand@bertrand.com', '$2b$10$8Us/aX9gy278YwIplchIU.AmRHsYjjAc3wgv6Oa5VSghrUCcFyMPy', 0, 'Bertrand', 'Bertrand', '7 rue Jean Mermoz', 59720, 'Louvroil'),
+(35, 'fatima@yahoo.fr', '$2b$10$Ub.PX1fnESmKvY4TfQRZQeIiKLqVXKi5ThyMi3ysoKo.pMwkS66IO', 0, 'Ait Khelifa', 'Fatima', '23 rue de l\'amiral courbet', 59000, 'Lille'),
+(36, 'bertran@bertrand.com', '$2b$10$DhufqsRk0NRe4CYmnkHO8Ompa04MY8ZwytxdddxOd69f/qedNfXdy', 0, 'Billin', 'Bertrand', '23 rue de l\'amiral courbet', 59000, 'Lille');
 
 --
 -- Contraintes pour les tables déchargées
