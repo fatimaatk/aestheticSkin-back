@@ -2,7 +2,7 @@ import dbConnect from "../config/db-config.js";
 
 const getAllFromCart = () => {
   return new Promise((resolve, reject) => {
-    dbConnect.query('SELECT * from many_product_cart LEFT JOIN cart ON many_product_cart.cart_id = cart.id LEFT JOIN products ON many_product_cart.product_id = products.id', (err, result) => {
+    dbConnect.query("SELECT cart.id, many_product_cart.cart_id,  GROUP_CONCAT(JSON_ARRAY('référence', many_product_cart.id, 'produit',products.title, 'quantité', many_product_cart.qty )) as products, CONCAT_WS(' ' , cart.nom_delivery, cart.prenom_delivery, cart.adress_delivery, cart.codePostal_delivery, cart.ville_delivery) as adresse_livraison,CONCAT_WS(' ' , cart.nom_shipping, cart.prenom_shipping, cart.adress_shipping, cart.codePostal_shipping, cart.ville_shipping) as adresse_facturation , cart.total_price, delivery_status.status, cart.date from many_product_cart LEFT JOIN cart ON many_product_cart.cart_id = cart.id LEFT JOIN products ON many_product_cart.product_id = products.id LEFT JOIN delivery_status ON cart.status_id = delivery_status.id GROUP BY many_product_cart.cart_id", (err, result) => {
       if (err) reject(err);
       else resolve(result);
     })
@@ -19,6 +19,14 @@ const getAllId = () => {
 const getAllFromCartById = (id) => {
   return new Promise((resolve, reject) => {
     dbConnect.query('SELECT * from cart where id = ?', id, (err, result) => {
+      if (err) reject(err);
+      else resolve(result);
+    })
+  })
+}
+const getAllFromCartByUser = (user_id) => {
+  return new Promise((resolve, reject) => {
+    dbConnect.query('SELECT * from cart where user_id = ?', user_id, (err, result) => {
       if (err) reject(err);
       else resolve(result);
     })
@@ -79,7 +87,7 @@ const UpdateCart = (id) => {
 
 const UpdateCartPayment = (id) => {
   return new Promise((resolve, reject) => {
-    dbConnect.query('UPDATE cart SET type_paiement = ?, status_id =?, price_delivery = ?, total_price = ? WHERE id = ?', id, (err, result) => {
+    dbConnect.query('UPDATE cart SET type_paiement = ?, status_id =?, price_delivery = ?, total_price = ?, date = ? WHERE id = ?', id, (err, result) => {
       if (err) reject(err);
       else resolve(result.insertId);
     })
@@ -93,4 +101,4 @@ const UpdateStatus = (id) => {
     })
   })
 }
-export default { getAllFromCart, NewItemInCart, getAllFromIdCart, NewCart, UpdateItemInCart, UpdateCart, UpdateCartPayment, UpdateStatus, getAllId, getAllFromCartById };
+export default { getAllFromCart, NewItemInCart, getAllFromIdCart, getAllFromCartByUser, NewCart, UpdateItemInCart, UpdateCart, UpdateCartPayment, UpdateStatus, getAllId, getAllFromCartById };

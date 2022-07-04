@@ -45,6 +45,17 @@ router.get('/infos/:id', async (req, res) => {
   }
 });
 
+//toute la commande par user
+router.get('/cart-user/:user_id', async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    const carts = await CartModel.getAllFromCartByUser(user_id)
+    res.send(carts)
+  } catch (error) {
+    res.status(500).send('Error server, try again !')
+  }
+});
+
 
 
 //liaison nouvel id avec les articles correspondants
@@ -128,8 +139,10 @@ router.put('/paiement/:id', async (req, res) => {
     req.body.status_id,
     req.body.price_delivery,
     req.body.total_price,
+    req.body.date,
     id
   ];
+  console.log(infos)
   try {
     const updateInfos = await CartModel.UpdateCartPayment(infos, id);
     res.status(200).send('Panier mis à jour !')
@@ -145,10 +158,12 @@ router.put('/status/:id', async (req, res) => {
     req.body.status_id,
     id
   ];
+  console.log(infos)
   try {
     const updateInfos = await CartModel.UpdateStatus(infos, id);
     res.status(200).send('Statut de commande mis à jour !')
   } catch (error) {
+    console.log(error)
     res.status(500).send('Error server, try again !')
   }
 });
