@@ -1,23 +1,23 @@
 import express from "express";
 import User from "../models/userModel.js";
-//permet de vérifier la qualité des données reçues
 import Joi from "joi";
-//permet de crypter les password
 import bcrypt from "bcrypt";
-//permet de vérifier les token, on doit ajouter la secret key dans le .env
 import jwt from "jsonwebtoken";
+
 const router = express.Router();
-//ici c'est le temps prévu pour le hash du password
+
+//Ici c'est le temps prévu pour le hash du mot de passe
 const saltRounds = 10;
 
 //On vérifie ensuite chaque réception
 const schemaUser = Joi.object({
+  //ici, trim permet de retirer les espaces
   email: Joi.string().email().required().trim(true),
   password: Joi.string()
     .regex(/^[a-zA-Z0-9]{3,30}$/)
     .required()
     .trim(true),
-  //ici permet d'attribuer par d"fault le isAdmin à false
+  //ici, on initie défault le isAdmin à false
   is_admin: Joi.boolean().default(false),
   lastname: Joi.string(),
   firstname: Joi.string(),
@@ -40,8 +40,6 @@ router.post("/register", async (req, res) => {
       codePostal,
       ville
     });
-    console.log(userIsValid)
-    //ici si l'email n'existe pas déja en me basaant sur mon model
     //ici si l'email n'est pas bien renseigné alors envoi d'un message au client
     const userExist = await User.findByEmail(userIsValid.value.email);
     if (userIsValid.error)
@@ -50,22 +48,17 @@ router.post("/register", async (req, res) => {
         .json({ error: userIsValid.error.details[0].messsage });
     //ici si l'email existe deja alors envoi d'un message d'erreur au client
     if (userExist)
-      return res.json({ error: "Cet email existe déjà." }).status(409);
-
+      return res.status(409).json({ error: "Cet email existe déjà." });
     //ici je gère l'envoie en base de données
     try {
       //ici je hash le password
       const hash = bcrypt.hashSync(userIsValid.value.password, saltRounds);
       userIsValid.value.password = hash;
       //ici je recupère l'id crée
-
       const userId = await User.createNew(userIsValid.value);
-      console.log(userId)
       //ici j'envoie au client
       const user = await User.findById(userId);
-
       res.status(201).json(user);
-
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -73,6 +66,8 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;

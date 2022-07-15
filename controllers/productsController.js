@@ -1,10 +1,12 @@
 import express from 'express';
 import ProductModel from '../models/productModel.js';
+
+const router = express.Router();
+
 import multer from "multer";
 import path from "path";
 import Joi from "joi";
 
-const router = express.Router();
 
 const schemaProduct = Joi.object({
   title: Joi.string().max(255).required(),
@@ -36,22 +38,20 @@ const upload = multer({
 });
 
 
-
 router.get('/', async (req, res) => {
   try {
     const products = await ProductModel.getAll()
-    res.send(products)
+    res.status(200).json(products)
   } catch (error) {
     res.status(500).send('Error server, try again !')
   }
 });
 
-
 router.get('/:id', async (req, res) => {
   const id = Number(req.params.id)
   try {
     const product = await ProductModel.getOneById(id)
-    res.send(product);
+    res.status(200).json(product);
   } catch (error) {
     res.status(500).send('Error server, try again !')
   }
@@ -65,11 +65,14 @@ router.put('/:id', async (req, res) => {
   ];
   try {
     const updateInfos = await ProductModel.updateProduct(infos, id);
-    res.send(updateInfos)
+    res.status(200).json(updateInfos)
   } catch (error) {
     res.status(500).send('Error server, try again !')
   }
 });
+
+
+
 
 router.post("/newproduct", upload.array("images", 3), async (req, res) => {
   const image1 = `http://localhost:3000/assets/${req.files[0].filename}`;
@@ -78,7 +81,6 @@ router.post("/newproduct", upload.array("images", 3), async (req, res) => {
   const {
     title, price, category_id, texture_id, description, ingredients, contenance
   } = req.body;
-
   try {
     const { error, value } = schemaProduct.validate({
       title, image1, image2, image3, price, category_id, texture_id, description, ingredients, contenance
@@ -86,10 +88,9 @@ router.post("/newproduct", upload.array("images", 3), async (req, res) => {
     const lastInsertId = await ProductModel.createProduct(value);
     if (lastInsertId) {
       const newProduct = await ProductModel.getOneById(lastInsertId);
-      res.json(newProduct);
+      res.status(200).json(newProduct);
     } else res.status(422).json({ message: error.message });
   } catch (err) {
-    console.log(err)
     res.status(500).json({ message: err.message });
   }
 });
@@ -103,5 +104,6 @@ router.delete('/delete/:id', async (req, res) => {
     res.status(500).send('Error server, try again !')
   }
 });
+
 
 export default router;
