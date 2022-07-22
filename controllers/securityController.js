@@ -27,10 +27,10 @@ const schemaUser = Joi.object({
 });
 
 router.post("/register", async (req, res) => {
+  //ici je récupère les entrées de l'utilisteur
   const { email, password, lastname, firstname, adresse, codePostal, ville } = req.body;
-  //ici je vérifie la qualité des données
   try {
-    //ici je valide le format de l'email et du password
+    //ici je valide la qualité des données
     const userIsValid = schemaUser.validate({
       email,
       password,
@@ -40,13 +40,14 @@ router.post("/register", async (req, res) => {
       codePostal,
       ville
     });
-    //ici si l'email n'est pas bien renseigné alors envoi d'un message au client
+    //ici si vérifie si l'email n'est pas déjà existant
     const userExist = await User.findByEmail(userIsValid.value.email);
+    //ici si la qualité des données n'est pas bonne, j'envoie un message d'erreur au client
     if (userIsValid.error)
       return res
         .status(422)
         .json({ error: userIsValid.error.details[0].messsage });
-    //ici si l'email existe deja alors envoi d'un message d'erreur au client
+    //ici si l'email existe deja alors j'envoie un message d'erreur au client
     if (userExist)
       return res.status(409).json({ error: "Cet email existe déjà." });
     //ici je gère l'envoie en base de données
@@ -54,9 +55,9 @@ router.post("/register", async (req, res) => {
       //ici je hash le password
       const hash = bcrypt.hashSync(userIsValid.value.password, saltRounds);
       userIsValid.value.password = hash;
-      //ici je recupère l'id crée
+      //ici je crée mon nouveau user
       const userId = await User.createNew(userIsValid.value);
-      //ici j'envoie au client
+      //ici j'envoie au client le résultat
       const user = await User.findById(userId);
       res.status(201).json(user);
     } catch (error) {
@@ -70,22 +71,26 @@ router.post("/register", async (req, res) => {
 
 
 router.post("/login", async (req, res) => {
+  //ici je récupère les entrées de l'utilisteur
   const { email, password } = req.body;
   try {
+    //ici je valide la qualité des données
     const userIsValid = schemaUser.validate({ email, password });
+    //ici je renvoie un msg d'erreur si la qualité des données n'est pas bonne
     if (userIsValid.error)
       return res
         .status(422)
         .json({ error: userIsValid.error.details[0].message });
+    //ici je vérifie si l'email existe bien en base de données
     const userExist = await User.findByEmail(userIsValid.value.email);
     if (userExist) {
-      //on récupère le mot de passe et on le compare avec celui en bdd
+      //ici on effectue une comparaison des mots de passe (gestion de du hash)
       const passwordIsValid = bcrypt.compareSync(
         userIsValid.value.password,
         userExist.password
       );
       if (passwordIsValid) {
-        //je crée ici le token
+        //je crée ici le token avec les éléments identifiés
         const token = jwt.sign(
           {
             email: userExist.email.toString(),
@@ -97,12 +102,14 @@ router.post("/login", async (req, res) => {
             ville: userExist.ville.toString(),
             id: userExist.id,
           },
+          //je sécurise ma création avec une secret key
           process.env.SECRET_KEY,
+          //je gère la destruction du token
           {
             expiresIn: 36000 * 2,
           }
         );
-        console.log(token)
+        //Ici j'utilise une méthode native à express permettant d'envoie la reponse via un cookie
         res
           .cookie("token", token).send({
             email: userExist.email.toString(),
@@ -128,6 +135,7 @@ router.post("/login", async (req, res) => {
 
 //on crée notre middleware
 const verifyJWT = (req, res, next) => {
+  //Je récupère mon token
   const token = req.cookies["token"];
   if (!token) return res.json({ error: "No token provided" }).status(401);
   jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
