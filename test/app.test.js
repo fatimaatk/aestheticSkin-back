@@ -98,7 +98,7 @@ describe("Test pour l'inscription", () => {
       await request(app)
         .post("/security/register")
         .send({
-          email: `jestTestNew${random(100)}@test.com`,
+          email: `jestTestNew${random(1000)}@test.com`,
           password: 'password',
           lastname: 'lastname',
           firstname: 'firstname',
