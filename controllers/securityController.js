@@ -10,6 +10,22 @@ const router = express.Router();
 const saltRounds = 10;
 
 //On vérifie ensuite chaque réception
+const schemaUserForRegister = Joi.object({
+  //ici, trim permet de retirer les espaces
+  email: Joi.string().email().required().trim(true),
+  password: Joi.string()
+    .regex(/^[a-zA-Z0-9]{3,30}$/)
+    .required()
+    .trim(true),
+  //ici, on initie défault le isAdmin à false
+  is_admin: Joi.boolean().default(false),
+  lastname: Joi.string().required(),
+  firstname: Joi.string().required(),
+  adresse: Joi.string().required(),
+  codePostal: Joi.number().required(),
+  ville: Joi.string().required(),
+});
+//On vérifie ensuite chaque réception
 const schemaUser = Joi.object({
   //ici, trim permet de retirer les espaces
   email: Joi.string().email().required().trim(true),
@@ -31,7 +47,7 @@ router.post("/register", async (req, res) => {
   const { email, password, lastname, firstname, adresse, codePostal, ville } = req.body;
   try {
     //ici je valide la qualité des données
-    const userIsValid = schemaUser.validate({
+    const userIsValid = schemaUserForRegister.validate({
       email,
       password,
       lastname,
@@ -88,7 +104,7 @@ router.post("/login", async (req, res) => {
       const passwordIsValid = bcrypt.compareSync(
         userIsValid.value.password,
         userExist.password
-      );
+      )
       if (passwordIsValid) {
         //je crée ici le token avec les éléments identifiés
         const token = jwt.sign(
@@ -126,7 +142,7 @@ router.post("/login", async (req, res) => {
         res.json({ error: "Mot de passe incorrect" }).status(401);
       }
     } else {
-      res.json({ error: "Email incorrect" }).status(404);
+      res.json({ error: "Email incorrect" }).status(401);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
